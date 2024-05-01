@@ -29,7 +29,7 @@ jobs:
       - name: Deploy to autoscaling group
         run: |
           mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
-          aws s3 cp ${{ secrets.S3_BUCKET }}/app_$(date +%Y-%m-%d).tar.gz s3://{{ secrets.S3_BUCKET }}/
+          aws s3 cp ${{ secrets.S3_BUCKET }}/app_$(date +%Y-%m-%d).tar.gz s3://lubna-app/
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name lu --min-size 1 --max-size 2
       
       - name: Set S3 bucket expiry policy
