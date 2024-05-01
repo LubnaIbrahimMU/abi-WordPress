@@ -27,11 +27,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       
-      # - name: Deploy to autoscaling group
-      #   run: |
-      #     mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
-      #     aws s3 cp ${{ secrets.S3_BUCKET }}/app_$(date +%Y-%m-%d).tar.gz s3://${{ secrets.S3_BUCKET }}/
-      #     aws autoscaling update-auto-scaling-group --auto-scaling-group-name lu --launch-configuration-name new-launch-configuration
+      - name: Deploy to autoscaling group
+        run: |
+          mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
+          aws s3 cp ${{ secrets.S3_BUCKET }}/app_$(date +%Y-%m-%d).tar.gz s3://${{ secrets.S3_BUCKET }}/
+          aws autoscaling update-auto-scaling-group --auto-scaling-group-name lu --launch-configuration-name new-launch-configuration
       
       - name: Set S3 bucket expiry policy
         run: |
