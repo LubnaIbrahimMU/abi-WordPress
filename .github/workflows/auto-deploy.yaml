@@ -15,7 +15,7 @@ jobs:
       
       - name: Package repo
         run: |
-          git archive --bare repo.tar.gz app_$(date +"%Y-%m-%d").tar.gz HEAD
+          git archive --bare repo.tar.gz -o app_$(date +"%Y-%m-%d").tar.gz HEAD
           # git archive --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz HEAD
           # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
       
