@@ -15,8 +15,8 @@ jobs:
       
       - name: Package repo
         run: |
-          tar -czvf app_$(date +%Y-%m-%d).tar.gz HEAD
-          mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
+          tar -czvf app_$(date +%Y-%m-%d).tar.gz .
+          # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -27,6 +27,7 @@ jobs:
       
       - name: Deploy to autoscaling group
         run: |
+          mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
           aws s3 cp ${{ secrets.S3_BUCKET }}/app_$(date +%Y-%m-%d).tar.gz s3://{{ secrets.S3_BUCKET }}/
           aws autoscaling update-auto-scaling-group --auto-scaling-group-name lu --min-size 1 --max-size 2
       
