@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      instanceids: ${{ steps.asg.outputs.instanceids }}
+      s3object: ${{ steps.object.outputs.s3object }}
 
     steps:
       - name: Checkout code
