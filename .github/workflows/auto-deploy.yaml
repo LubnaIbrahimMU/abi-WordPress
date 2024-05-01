@@ -8,9 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      instanceids: ${{ steps.asg.outputs.instanceids }}
-      s3object: ${{ steps.object.outputs.s3object }}
+    # outputs:
+    #   instanceids: ${{ steps.asg.outputs.instanceids }}
+    #   s3object: ${{ steps.object.outputs.s3object }}
 
     steps:
       - name: Checkout code
@@ -19,8 +19,8 @@ jobs:
       - name: Package repo
         run: |
           # git archive --bare repo --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz --output=${s3object} HEAD
-          git archive --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz --output=${s3object} HEAD
-          echo "s3object=$s3object" >> $GITHUB_OUTPUT
+          git archive --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz HEAD
+          # echo "s3object=$s3object" >> $GITHUB_OUTPUT
           mkdir -p ${{ secrets.S3_BUCKET }}
           # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
       
@@ -71,8 +71,18 @@ jobs:
          echo "Object URL: $object_url"
          
          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          
+         for instance_id in $instance_ids; do
+          public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].PublicIpAddress' --output text)
+  
+          ssh -o StrictHostKeyChecking=no -i private_key ec2-user@$public_ip "
+            cd /home/ec2-user
+            aws s3 cp s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz  .
+            "
+            done
+        
 
-         echo "s3object: ${{ needs.build.outputs.s3object }}"
+         # echo "s3object: ${{ needs.build.outputs.s3object }}"
          
           # Iterate over each instance
           #  for instance_id in $instance_ids; do
