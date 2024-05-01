@@ -35,13 +35,18 @@ jobs:
       
       - name: Set S3 bucket expiry policy
         run: |
-          aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration file://lifecycle.xml '{
-            "Rules": [
-              {
-                "Expiration": {
-                  "Days": 7
-                },
-                "Status": "Enabled"
-              }
-            ]
-          }'
+          aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration '{"Rules":[{"ID":"DeleteObjectsAfter7Days","Prefix":"","Status":"Enabled","Expiration":{"Days":7}}]}'
+          # aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration file://lifecycle.xml '{
+          #   "Rules": [
+          #     {
+          #       "Expiration": {
+          #         "Days": 7
+          #       },
+          #       "Status": "Enabled"
+          #     }
+          #   ]
+          # }'
+
+
+
+
