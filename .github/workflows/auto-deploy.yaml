@@ -65,7 +65,9 @@ jobs:
         # env:
         #   PRIVATE_KEY: ${{ secrets.KEY_PEM }}
         run: |
-         export instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
+         # export instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
+        
+         instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
          echo "Instance IDs: $instance_ids"
          # object_url=$(aws s3 presign s3://${{ secrets.S3_BUCKET }}/${{ needs.build.outputs.s3object }})
          # echo "Object URL: $object_url"
