@@ -58,8 +58,8 @@ jobs:
       #   # uses: webfactory/ssh-agent@v0.5.3
       #   with:
       - name: Deploy to Auto Scaling Group
-        env:
-        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY_PEM }}
+        with:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY_PEM }}
         run: |
          export instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
          echo "Instance IDs: $instance_ids"
