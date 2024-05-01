@@ -85,7 +85,7 @@ jobs:
             aws s3 cp s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz  .
             "
             done
-        
+          echo "lu"
 
          # echo "s3object: ${{ needs.build.outputs.s3object }}"
          
