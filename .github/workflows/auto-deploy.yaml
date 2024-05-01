@@ -35,7 +35,7 @@ jobs:
       
       - name: Set S3 bucket expiry policy
         run: |
-          aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration '{
+          aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration file://lifecycle.xml '{
             "Rules": [
               {
                 "Expiration": {
