@@ -15,7 +15,8 @@ jobs:
       
       - name: Package repo
         run: |
-          git archive --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz 
+          git clone --bare repo.tar.gz app_$(date +"%Y-%m-%d").tar.gz HEAD
+          # git archive --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz HEAD
           # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
       
       - name: Configure AWS credentials
