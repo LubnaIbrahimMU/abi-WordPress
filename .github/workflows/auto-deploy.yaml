@@ -15,7 +15,7 @@ jobs:
       
       - name: Package repo
         run: |
-          tar -czvf app_$(date +%Y-%m-%d).tar.gz .
+          tar -xzf app_$(date +%Y-%m-%d).tar.gz .
           # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
       
       - name: Configure AWS credentials
