@@ -70,8 +70,8 @@ jobs:
          # object_url=$(aws s3 presign s3://${{ secrets.S3_BUCKET }}/${{ needs.build.outputs.s3object }})
          # echo "Object URL: $object_url"
          
-         echo "secrets.KEY_PEM" > KEY_PEM && chmod 600 KEY_PEM
-         cat KEY_PEM
+         # echo "secrets.KEY_PEM" > KEY_PEM && chmod 600 KEY_PEM
+         # cat KEY_PEM
          echo "Instance IDs: $instance_ids"
          
           
