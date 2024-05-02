@@ -23,7 +23,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      
+          
+      - name: push to bucket
+        run: |
+          mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
       # - name: Deploy to Auto Scaling Group
       #   run: |
       #     instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
@@ -44,6 +47,10 @@ jobs:
               aws s3 cp s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz  .
             "
           done
+        env:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1
 
       - name: Set S3 bucket expiry policy
         run: |
