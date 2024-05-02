@@ -86,6 +86,7 @@ jobs:
       run: |
          url="${{ steps.presigned_url.outputs.url }}"
          curl -sSL "$url" | xdg-open /dev/stdin  # Open the URL in the default web browser
+         xdg-open "$url"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
