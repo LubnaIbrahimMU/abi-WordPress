@@ -27,13 +27,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1 
     
-    # - name: Set expiry policy on S3 bucket
-    #   run: |
-    #     aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET_NAME }} --lifecycle-configuration '{"Rules":[{"ID":"ExpireOldBuilds","Prefix":"","Status":"Enabled","Expiration":{"Days":7}}]}'
-    #   env:
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     AWS_REGION: us-east-1  
 
 
   deploy:
@@ -68,6 +61,36 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1 
+        
+    - name: Set up AWS CLI
+      run: aws-actions/configure-aws-credentials@v2
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1 
+
+        
+    - name: Generate presigned URL for S3 object
+      id: presigned_url
+      run: |
+         object_url=$(aws s3 presign s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz
+         echo "Object URL: $object_url"
+         echo "::set-output name=url::$object_url"  # Set the URL as an output for later steps
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1 
+
+    - name: Open URL in browser
+      if: success()
+      run: |
+         url="${{ steps.presigned_url.outputs.url }}"
+         curl -sSL "$url" | xdg-open /dev/stdin  # Open the URL in the default web browser
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1 
+
 
     - name: Set S3 bucket expiry policy
       run: |
