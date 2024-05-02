@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # outputs:
-    #   instanceids: ${{ steps.asg.outputs.instanceids }}
-    #   s3object: ${{ steps.object.outputs.s3object }}
 
     steps:
       - name: Checkout code
@@ -18,12 +15,8 @@ jobs:
     
       - name: Package repo
         run: |
-          # git archive --bare repo --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz --output=${s3object} HEAD
           git archive --format=tar.gz -o app_$(date +"%Y-%m-%d").tar.gz HEAD
-          # echo "s3object=$s3object" >> $GITHUB_OUTPUT
-          mkdir -p ${{ secrets.S3_BUCKET }}
-          # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -31,80 +24,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       
-      - name: Deploy to autoscaling group
+      - name: Deploy to Auto Scaling Group
         run: |
-          mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
-          # aws s3 cp ${{ secrets.S3_BUCKET }}/app_$(date +%Y-%m-%d).tar.gz s3://${{ secrets.S3_BUCKET }}/
-          # aws autoscaling update-auto-scaling-group --auto-scaling-group-name lu --launch-configuration-name new-launch-configuration     
-      
+          instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
+          echo "Instance IDs: $instance_ids"
+          
+          # Save the private key to a file
+          echo "${{ secrets.KEY_PEM }}" > KEY_PEM && chmod 600 KEY_PEM
+          
+          for instance_id in $instance_ids; do
+            public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].PublicIpAddress' --output text)
+            ssh -o StrictHostKeyChecking=no -i KEY_PEM ubuntu@$public_ip "
+              cd /home/ubuntu
+              aws s3 cp s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz  .
+            "
+          done
+
       - name: Set S3 bucket expiry policy
         run: |
           aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration '{"Rules":[{"ID":"DeleteObjectsAfter7Days","Prefix":"","Status":"Enabled","Expiration":{"Days":7}}]}'
-      #     # aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration file://lifecycle.xml '{
-      #     #   "Rules": [
-      #     #     {
-      #     #       "Expiration": {
-      #     #         "Days": 7
-      #     #       },
-      #     #       "Status": "Enabled"
-      #     #     }
-      #     #   ]
-      #     # }'
-
-      
-      
-      # - name: Install AWS CLI
-      #   run: |
-      #    sudo apt-get update
-      #    sudo apt-get install -y awscli
-
-      # - name: Install SSH key
-      #   # uses: webfactory/ssh-agent@v0.5.3
-      #   with:
-      - name: Deploy to Auto Scaling Group
-        # env:
-        #   PRIVATE_KEY: ${{ secrets.KEY_PEM }}
-        run: |
-         # export instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
-        
-         instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
-         echo "Instance IDs: $instance_ids"
-         # object_url=$(aws s3 presign s3://${{ secrets.S3_BUCKET }}/${{ needs.build.outputs.s3object }})
-         # echo "Object URL: $object_url"
-         
-         echo "${{ secrets.KEY_PEM }}" > KEY_PEM && chmod 600 KEY_PEM
-         cat KEY_PEM
-         echo "Instance IDs: $instance_ids"
-         
-          
-         for instance_id in $instance_ids; do
-          public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].PublicIpAddress' --output text)
-          ssh -o StrictHostKeyChecking=no -i KEY_PEM ubuntu@$public_ip "
-            cd /home/ubuntu
-            aws s3 cp s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz  .
-             "
-             
-            done
-          echo "lu"
-
-         # echo "s3object: ${{ needs.build.outputs.s3object }}"
-         
-          # Iterate over each instance
-          #  for instance_id in $instance_ids; do
-          # # Get the public IP address of the instance
-          # public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].PublicIpAddress' --output text)
-
-          # # SSH into the instance and download the object from the S3 bucket
-          # ssh -o StrictHostKeyChecking=no -i private_key ec2-user@$public_ip "
-          #   cd /var/www/html
-          #   sudo wget \"$object_url\" -O ${{ needs.build.outputs.s3object }}
-          #   sudo tar -xvzf ${{ needs.build.outputs.s3object }}
-          #   sudo rm -rf ${{ needs.build.outputs.s3object }}
-          #   sudo systemctl restart httpd
-          # "
-          # done
-    
-
-
-
-
