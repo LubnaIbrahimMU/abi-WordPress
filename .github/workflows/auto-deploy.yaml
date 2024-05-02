@@ -20,7 +20,8 @@ jobs:
         
     - name: push to bucket
       run: |
-       mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
+       # mv app_$(date +%Y-%m-%d).tar.gz ${{ secrets.S3_BUCKET }}
+       aws s3 cp app_$(date +"%Y-%m-%d").tar.gz s3://${{ secrets.S3_BUCKET }}/
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
