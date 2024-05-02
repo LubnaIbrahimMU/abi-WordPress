@@ -73,7 +73,7 @@ jobs:
     - name: Generate presigned URL for S3 object
       id: presigned_url
       run: |
-         object_url=$(aws s3 presign s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz
+         object_url=$(aws s3 presign s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz)
          echo "Object URL: $object_url"
          echo "::set-output name=url::$object_url"  # Set the URL as an output for later steps
       env:
