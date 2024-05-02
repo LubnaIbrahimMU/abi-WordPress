@@ -26,13 +26,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1 
     
-    - name: Set expiry policy on S3 bucket
-      run: |
-        aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET_NAME }} --lifecycle-configuration '{"Rules":[{"ID":"ExpireOldBuilds","Prefix":"","Status":"Enabled","Expiration":{"Days":7}}]}'
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: us-east-1  
+    # - name: Set expiry policy on S3 bucket
+    #   run: |
+    #     aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET_NAME }} --lifecycle-configuration '{"Rules":[{"ID":"ExpireOldBuilds","Prefix":"","Status":"Enabled","Expiration":{"Days":7}}]}'
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_REGION: us-east-1  
 
 
   deploy:
@@ -65,3 +65,12 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1 
+
+    - name: Set S3 bucket expiry policy
+      run: |
+        aws s3api put-bucket-lifecycle-configuration --bucket ${{ secrets.S3_BUCKET }} --lifecycle-configuration '{"Rules":[{"ID":"DeleteObjectsAfter7Days","Prefix":"","Status":"Enabled","Expiration":{"Days":7}}]}'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1 
+       
