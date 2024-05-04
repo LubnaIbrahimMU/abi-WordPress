@@ -46,7 +46,9 @@ jobs:
         echo $instance_ids 
         
         # instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
+
         
+        # Loop through each instance in the Auto Scaling Group
         for instance_id in $instance_ids; do
           public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].PublicIpAddress' --output text)
   
