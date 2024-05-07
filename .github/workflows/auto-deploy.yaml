@@ -40,13 +40,14 @@ jobs:
       run: |
         echo "Pushing to ASG"
         instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
+        aws autoscaling start-instance-refresh --auto-scaling-group-name lu
         echo $instance_ids
         echo "${{ secrets.KEY_PEM }}" > KEY_PEM && chmod 600 KEY_PEM
         cat KEY_PEM
         echo $instance_ids 
         
         # instance_ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name lu --query 'AutoScalingGroups[].Instances[].InstanceId' --output text)
-
+          
         
         # Loop through each instance in the Auto Scaling Group
         for instance_id in $instance_ids; do
