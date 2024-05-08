@@ -57,7 +57,7 @@ jobs:
             cd /home/ubuntu
             aws s3 cp s3://${{ secrets.S3_BUCKET }}/app_$(date +"%Y-%m-%d").tar.gz  .
             sudo tar -xzvf app_$(date +"%Y-%m-%d").tar.gz
-            sudo systemctl restart apache2
+            # sudo systemctl restart apache2
             "
         done
       env:
